@@ -10,7 +10,7 @@ serverSocket = socket(AF_INET, SOCK_DGRAM)
 # Assign IP address and port number to socket
 serverSocket.bind(('', 12000))
 
-print('The server is ready to receive')
+print('Waiting for client....\n')
 pingnum = 0
 while True:
     # Count the pings received
@@ -20,12 +20,15 @@ while True:
     # Receive the client packet along with the
     # address it is coming from
     message, address = serverSocket.recvfrom(1024)
-
-    message = message.decode().upper()
     # If rand is less is than 4, and this not the
     # first "ping" of a group of 10, consider the
     # packet lost and do not respond
     if rand < 4 and pingnum % 10 != 1:
+        print('Packet was lost.\n')
         continue
     # Otherwise, the server responds
+    print('PING', pingnum, 'Received')
+    print('Mesg rcvd:', message.decode())
+    message = message.decode().upper()
+    print('Mesg sent:', message, '\n')
     serverSocket.sendto(message.encode(), address)
