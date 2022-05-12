@@ -1,34 +1,50 @@
+import math
 import time
 from socket import *
-serverName = '10.0.0.2'
-serverPort = 12000
-clientSocket = socket(AF_INET,SOCK_DGRAM)
-clientSocket.settimeout(1)
 
-for i in range(1,11):
+host = '10.0.0.2'
+port = 12000
+timeout = 1  # in seconds
 
-  try:
-    message = 'Ping'+ str(i)
-    startTime = time.time()
-    clientSocket.sendto(message.encode(),(serverName,serverPort))
-    modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
-    returnTime = time.time()
-    print('Mesg sent:', 'Ping'+ str(i))
-    print('Mesg rcvd:', modifiedMessage.decode())
-    print('Start time:', '{:e}'.format(startTime))
-    print('Return time:', '{:e}'.format(returnTime))
-    print('PONG', i, 'RTT: \n')
-  except:
-    print('Mesg sent:', 'Ping' + str(i))
-    print('No Mesg rcvd')
-    print('PONG', i, 'Request timed out \n')
+alpha = 0.125
+beta = 0.25
+# Creates UDP client socket
+clientSocket = socket(AF_INET, SOCK_DGRAM)
+# sets socket timeout to 1 second
+clientSocket.settimeout(timeout)
+# array to hold rtt
+rtt_stats = []
+for i in range(1, 11):
+    data = 'Ping {}'.format(str(i))
 
+    try:
+        # Sent time
+        sendTime = time.time()
+        # Send the UDP packet with ping message
+        clientSocket.sendto(data.encode(), (host, port))
+        # Receive server response
+        modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
+        # Received time
+        returnTime = time.time()
+        # calculate RTT
+        rtt = (returnTime - sendTime) * 1000
+        # Add rtt to array
+        rtt_stats.append(rtt)
 
-print('Min RTT:')
-print('Max RTT:')
-print('Avg RTT:')
+        print('Mesg sent:', data)
+        print('Mesg rcvd:', modifiedMessage.decode())
+        print('Start time:', '{:e}'.format(sendTime))
+        print('Return time:', '{:e}'.format(returnTime))
+        print('PONG {} RTT: {}ms'.format(i, rtt))
+    except:
+        print('PONG', i, 'Request timed out \n')
+        continue
+clientSocket.close()
+
+print('Min RTT: {}'.format(min(rtt_stats)))
+print('Max RTT: {}'.format(max(rtt_stats)))
+print('Avg RTT: {}'.format(sum(rtt_stats) / len(rtt_stats)))
 print('Packet Loss:')
 print('Estimated RTT:')
 print('Dev RTT:')
 print('Timeout Interval:')
-clientSocket.close()
