@@ -1,11 +1,10 @@
-import math
 import time
 from socket import *
 
 host = '10.0.0.2'
 port = 12000
 timeout = 1  # in seconds
-
+#used for stats
 alpha = 0.125
 beta = 0.25
 # Creates UDP client socket
@@ -35,16 +34,19 @@ for i in range(1, 11):
         print('Mesg rcvd:', modifiedMessage.decode())
         print('Start time:', '{:e}'.format(sendTime))
         print('Return time:', '{:e}'.format(returnTime))
-        print('PONG {} RTT: {}ms'.format(i, rtt))
+        print('PONG {} RTT: {} ms\n'.format(i, rtt))
     except:
         print('PONG', i, 'Request timed out \n')
         continue
 clientSocket.close()
 
+# Stats
+loss = ((10 - len(rtt_stats))/10)*100
+
 print('Min RTT: {}'.format(min(rtt_stats)))
 print('Max RTT: {}'.format(max(rtt_stats)))
 print('Avg RTT: {}'.format(sum(rtt_stats) / len(rtt_stats)))
-print('Packet Loss:')
+print('Packet Loss: {}%'.format(loss))
 print('Estimated RTT:')
 print('Dev RTT:')
 print('Timeout Interval:')
