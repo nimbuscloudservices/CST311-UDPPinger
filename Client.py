@@ -11,8 +11,6 @@ estimatedRTT = 0
 devRTT = 0
 # Creates UDP client socket
 clientSocket = socket(AF_INET, SOCK_DGRAM)
-# sets socket timeout to 1 second
-clientSocket.settimeout(timeout)
 # array to hold rtt
 rtt_stats = []
 for i in range(1, 11):
@@ -27,6 +25,8 @@ for i in range(1, 11):
         modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
         # Received time
         returnTime = time.time()
+        # sets socket timeout to 1 second
+        clientSocket.settimeout(timeout)
         # calculate RTT
         rtt = (returnTime - sendTime) * 1000
         # Add rtt to array
@@ -43,7 +43,7 @@ for i in range(1, 11):
         print('Start time:', '{:e}'.format(sendTime))
         print('Return time:', '{:e}'.format(returnTime))
         print('PONG {} RTT: {} ms\n'.format(i, rtt))
-    except timeout:
+    except:
         print('PONG', i, 'Request timed out \n')
         continue
 clientSocket.close()
